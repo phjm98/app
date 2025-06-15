@@ -220,10 +220,22 @@ const Header = ({ cartCount, searchTerm, onSearchChange, onSearch }) => {
   );
 };
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, onAddToCart, onProductClick }) => {
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAddToCart = async () => {
+    setIsAdding(true);
+    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
+    onAddToCart(product);
+    setIsAdding(false);
+  };
+
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-lg transition-shadow duration-300">
-      <div className="aspect-square mb-3 overflow-hidden rounded-lg bg-gray-50">
+    <div className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-lg transition-shadow duration-300 cursor-pointer">
+      <div 
+        className="aspect-square mb-3 overflow-hidden rounded-lg bg-gray-50"
+        onClick={() => onProductClick(product)}
+      >
         <img
           src={product.image}
           alt={product.name}
@@ -231,7 +243,10 @@ const ProductCard = ({ product }) => {
         />
       </div>
       <div className="text-center">
-        <h3 className="text-sm font-medium text-gray-800 mb-2 text-right">
+        <h3 
+          className="text-sm font-medium text-gray-800 mb-2 text-right cursor-pointer hover:text-blue-600"
+          onClick={() => onProductClick(product)}
+        >
           {product.name}
         </h3>
         <div className="bg-blue-600 text-white text-xs py-1 px-2 rounded text-center mb-2">
@@ -242,8 +257,16 @@ const ProductCard = ({ product }) => {
             {product.price} دينار
           </div>
         )}
-        <button className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors duration-300 text-sm">
-          🛒 أضف للسلة
+        <button 
+          onClick={handleAddToCart}
+          disabled={isAdding}
+          className={`w-full py-2 rounded text-sm transition-colors duration-300 ${
+            isAdding 
+              ? 'bg-gray-400 text-white cursor-not-allowed' 
+              : 'bg-blue-500 text-white hover:bg-blue-600'
+          }`}
+        >
+          {isAdding ? 'جاري الإضافة...' : '🛒 أضف للسلة'}
         </button>
       </div>
     </div>
