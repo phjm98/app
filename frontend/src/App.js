@@ -156,20 +156,20 @@ const bestSellingProducts = [
   }
 ];
 
-const Header = () => {
+const Header = ({ cartCount, searchTerm, onSearchChange, onSearch }) => {
   return (
     <header className="bg-white border-b border-gray-200">
       {/* Top bar with links */}
       <div className="bg-gray-50 px-4 py-2 text-sm">
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <div className="flex space-x-4 text-gray-600">
-            <a href="#" className="hover:text-gray-800">تسجيل دخول</a>
-            <a href="#" className="hover:text-gray-800">حساب جديد</a>
-            <a href="#" className="hover:text-gray-800">تتبع الطلب</a>
-            <a href="#" className="hover:text-gray-800">مفضلة</a>
+            <button className="hover:text-gray-800 cursor-pointer">تسجيل دخول</button>
+            <button className="hover:text-gray-800 cursor-pointer">حساب جديد</button>
+            <button className="hover:text-gray-800 cursor-pointer">تتبع الطلب</button>
+            <button className="hover:text-gray-800 cursor-pointer">مفضلة</button>
           </div>
           <div className="text-right">
-            🛒 سلة التسوق (0)
+            🛒 سلة التسوق ({cartCount})
           </div>
         </div>
       </div>
@@ -186,12 +186,12 @@ const Header = () => {
               لتجارة قرطاسية
             </h2>
             <div className="flex justify-center items-center space-x-8">
-              <div className="text-2xl font-bold text-blue-500">
-                07807684041
-              </div>
-              <div className="text-2xl font-bold text-red-500">
-                07701227410
-              </div>
+              <button className="text-2xl font-bold text-blue-500 hover:text-blue-600 cursor-pointer">
+                📞 07807684041
+              </button>
+              <button className="text-2xl font-bold text-red-500 hover:text-red-600 cursor-pointer">
+                📞 07701227410
+              </button>
             </div>
           </div>
 
@@ -201,9 +201,15 @@ const Header = () => {
               <input
                 type="text"
                 placeholder="البحث عن المنتجات..."
+                value={searchTerm}
+                onChange={(e) => onSearchChange(e.target.value)}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-right focus:border-blue-500 focus:outline-none"
+                onKeyPress={(e) => e.key === 'Enter' && onSearch()}
               />
-              <button className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-red-500 text-white px-4 py-1 rounded">
+              <button 
+                onClick={onSearch}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 transition-colors duration-300"
+              >
                 بحث
               </button>
             </div>
