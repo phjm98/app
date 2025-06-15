@@ -329,7 +329,7 @@ const BestSellingCard = ({ product, onAddToCart, onProductClick }) => {
   );
 };
 
-const ProductGrid = ({ products, title }) => {
+const ProductGrid = ({ products, title, onAddToCart, onProductClick }) => {
   return (
     <section className="py-8">
       <div className="max-w-7xl mx-auto px-4">
@@ -340,7 +340,12 @@ const ProductGrid = ({ products, title }) => {
         )}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard 
+              key={product.id} 
+              product={product} 
+              onAddToCart={onAddToCart}
+              onProductClick={onProductClick}
+            />
           ))}
         </div>
       </div>
