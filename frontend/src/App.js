@@ -383,12 +383,12 @@ const Footer = () => {
           {/* Contact Information */}
           <div className="mb-6">
             <div className="flex justify-center items-center space-x-8 mb-4">
-              <div className="text-lg font-bold text-blue-500">
+              <button className="text-lg font-bold text-blue-500 hover:text-blue-600 cursor-pointer">
                 📞 07807684041
-              </div>
-              <div className="text-lg font-bold text-red-500">
+              </button>
+              <button className="text-lg font-bold text-red-500 hover:text-red-600 cursor-pointer">
                 📞 07701227410
-              </div>
+              </button>
             </div>
             <div className="text-gray-600">
               📧 Karawan.Art.2018@gmail.com
@@ -397,18 +397,18 @@ const Footer = () => {
 
           {/* Social Media Icons */}
           <div className="flex justify-center space-x-4 mb-6">
-            <a href="#" className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors duration-300">
+            <button className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors duration-300">
               f
-            </a>
-            <a href="#" className="w-10 h-10 bg-blue-400 text-white rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-300">
+            </button>
+            <button className="w-10 h-10 bg-blue-400 text-white rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors duration-300">
               t
-            </a>
-            <a href="#" className="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center hover:bg-green-600 transition-colors duration-300">
+            </button>
+            <button className="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center hover:bg-green-600 transition-colors duration-300">
               w
-            </a>
-            <a href="#" className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors duration-300">
+            </button>
+            <button className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors duration-300">
               i
-            </a>
+            </button>
           </div>
 
           {/* Copyright */}
@@ -418,6 +418,129 @@ const Footer = () => {
         </div>
       </div>
     </footer>
+  );
+};
+
+// Product Detail Modal Component
+const ProductModal = ({ product, isOpen, onClose, onAddToCart }) => {
+  const [quantity, setQuantity] = useState(1);
+  const [isAdding, setIsAdding] = useState(false);
+
+  if (!isOpen || !product) return null;
+
+  const handleAddToCart = async () => {
+    setIsAdding(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    onAddToCart({ ...product, quantity });
+    setIsAdding(false);
+    onClose();
+  };
+
+  const totalPrice = (parseFloat(product.price) * quantity).toFixed(1);
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="relative p-6">
+          <button
+            onClick={onClose}
+            className="absolute top-4 left-4 text-gray-400 hover:text-gray-600 text-2xl"
+          >
+            ×
+          </button>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Product Image */}
+            <div className="aspect-square overflow-hidden rounded-lg">
+              <img
+                src={product.image}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            
+            {/* Product Details */}
+            <div className="text-right">
+              <h2 className="text-2xl font-bold mb-4">{product.name}</h2>
+              <div className="bg-blue-600 text-white text-sm py-1 px-3 rounded inline-block mb-4">
+                {product.category}
+              </div>
+              {product.id && (
+                <p className="text-gray-600 mb-4">كود المنتج: {product.id}</p>
+              )}
+              <div className="text-3xl font-bold text-green-600 mb-6">
+                {product.price} دينار
+              </div>
+              
+              {/* Quantity Selector */}
+              <div className="flex items-center justify-end mb-6">
+                <div className="flex items-center border rounded-lg">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="px-3 py-2 text-lg font-bold hover:bg-gray-100"
+                  >
+                    -
+                  </button>
+                  <span className="px-4 py-2 border-x">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="px-3 py-2 text-lg font-bold hover:bg-gray-100"
+                  >
+                    +
+                  </button>
+                </div>
+                <span className="mr-3">الكمية:</span>
+              </div>
+              
+              {/* Total Price */}
+              <div className="text-xl font-bold text-green-600 mb-6 text-right">
+                المجموع: {totalPrice} دينار
+              </div>
+              
+              {/* Add to Cart Button */}
+              <button
+                onClick={handleAddToCart}
+                disabled={isAdding}
+                className={`w-full py-3 rounded-lg text-lg font-semibold transition-colors duration-300 ${
+                  isAdding 
+                    ? 'bg-gray-400 text-white cursor-not-allowed' 
+                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
+              >
+                {isAdding ? 'جاري الإضافة...' : '🛒 أضف إلى السلة'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Success Notification Component
+const SuccessNotification = ({ message, isVisible, onClose }) => {
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setTimeout(onClose, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible, onClose]);
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slide-in">
+      <div className="flex items-center">
+        <span className="ml-2">✅</span>
+        <span>{message}</span>
+        <button
+          onClick={onClose}
+          className="mr-4 text-white hover:text-green-200"
+        >
+          ×
+        </button>
+      </div>
+    </div>
   );
 };
 
