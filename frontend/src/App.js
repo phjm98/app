@@ -545,14 +545,116 @@ const SuccessNotification = ({ message, isVisible, onClose }) => {
 };
 
 function App() {
+  const [cart, setCart] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredProducts, setFilteredProducts] = useState(productData);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [notification, setNotification] = useState({ message: '', isVisible: false });
+
+  // Filter products based on search term
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredProducts(productData);
+    } else {
+      const filtered = productData.filter(product =>
+        product.name.includes(searchTerm) ||
+        product.category.includes(searchTerm)
+      );
+      setFilteredProducts(filtered);
+    }
+  }, [searchTerm]);
+
+  // Add item to cart
+  const handleAddToCart = (product) => {
+    const existingItem = cart.find(item => item.id === product.id);
+    
+    if (existingItem) {
+      setCart(cart.map(item =>
+        item.id === product.id
+          ? { ...item, quantity: item.quantity + (product.quantity || 1) }
+          : item
+      ));
+    } else {
+      setCart([...cart, { ...product, quantity: product.quantity || 1 }]);
+    }
+
+    showNotification(`تم إضافة ${product.name} إلى السلة`);
+  };
+
+  // Show notification
+  const showNotification = (message) => {
+    setNotification({ message, isVisible: true });
+  };
+
+  // Hide notification
+  const hideNotification = () => {
+    setNotification({ message: '', isVisible: false });
+  };
+
+  // Handle product click to open modal
+  const handleProductClick = (product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(null);
+  };
+
+  // Handle search
+  const handleSearch = () => {
+    // Search is handled by useEffect when searchTerm changes
+    if (searchTerm.trim() === '') {
+      showNotification('يرجى إدخال كلمة البحث');
+    } else if (filteredProducts.length === 0) {
+      showNotification('لا توجد منتجات مطابقة للبحث');
+    } else {
+      showNotification(`تم العثور على ${filteredProducts.length} منتج`);
+    }
+  };
+
+  // Calculate cart count
+  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+
   return (
     <div className="App min-h-screen bg-gray-50" dir="rtl">
-      <Header />
+      <Header 
+        cartCount={cartCount}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onSearch={handleSearch}
+      />
       <main>
-        <ProductGrid products={productData} />
-        <BestSellingSection />
+        <ProductGrid 
+          products={filteredProducts}
+          title={searchTerm ? `نتائج البحث عن: ${searchTerm}` : null}
+          onAddToCart={handleAddToCart}
+          onProductClick={handleProductClick}
+        />
+        <BestSellingSection 
+          onAddToCart={handleAddToCart}
+          onProductClick={handleProductClick}
+        />
       </main>
       <Footer />
+      
+      {/* Product Detail Modal */}
+      <ProductModal
+        product={selectedProduct}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onAddToCart={handleAddToCart}
+      />
+      
+      {/* Success Notification */}
+      <SuccessNotification
+        message={notification.message}
+        isVisible={notification.isVisible}
+        onClose={hideNotification}
+      />
     </div>
   );
 }
