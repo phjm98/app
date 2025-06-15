@@ -273,15 +273,27 @@ const ProductCard = ({ product, onAddToCart, onProductClick }) => {
   );
 };
 
-const BestSellingCard = ({ product }) => {
+const BestSellingCard = ({ product, onAddToCart, onProductClick }) => {
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAddToCart = async () => {
+    setIsAdding(true);
+    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
+    onAddToCart(product);
+    setIsAdding(false);
+  };
+
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-lg transition-shadow duration-300 relative">
+    <div className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-lg transition-shadow duration-300 relative cursor-pointer">
       {product.sale && (
         <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
           🔥
         </div>
       )}
-      <div className="aspect-square mb-3 overflow-hidden rounded-lg bg-gray-50">
+      <div 
+        className="aspect-square mb-3 overflow-hidden rounded-lg bg-gray-50"
+        onClick={() => onProductClick(product)}
+      >
         <img
           src={product.image}
           alt={product.name}
@@ -289,7 +301,10 @@ const BestSellingCard = ({ product }) => {
         />
       </div>
       <div className="text-center">
-        <h3 className="text-sm font-medium text-gray-800 mb-1 text-right">
+        <h3 
+          className="text-sm font-medium text-gray-800 mb-1 text-right cursor-pointer hover:text-blue-600"
+          onClick={() => onProductClick(product)}
+        >
           {product.name}
         </h3>
         <div className="text-xs text-gray-500 mb-2">
@@ -298,8 +313,16 @@ const BestSellingCard = ({ product }) => {
         <div className="text-lg font-bold text-green-600 mb-2">
           {product.price} دينار
         </div>
-        <button className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors duration-300 text-sm">
-          🛒 أضف للسلة
+        <button 
+          onClick={handleAddToCart}
+          disabled={isAdding}
+          className={`w-full py-2 rounded text-sm transition-colors duration-300 ${
+            isAdding 
+              ? 'bg-gray-400 text-white cursor-not-allowed' 
+              : 'bg-blue-500 text-white hover:bg-blue-600'
+          }`}
+        >
+          {isAdding ? 'جاري الإضافة...' : '🛒 أضف للسلة'}
         </button>
       </div>
     </div>
